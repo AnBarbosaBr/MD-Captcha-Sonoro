@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\title{Relatório do Projeto --- Mineração de Dados}
+\author{Primeiro autor, Segundo autor e Terceiro autor}
+\date{}
+
+\begin{document}
+\maketitle
+\section{Introdução}
+
+\textcolor{blue}{Descreva a base de dados que você irá analisar e contextualize a tarefa de
+predição que será realizada. Apresente brevemente as ferramentas/bibliotecas que utilizou para análises.}
+
+Nesse relatório serão analisados arquivos de audio, cada qual contendo a gravação de 4 letras e/ou números pertencentes ao conjunto $\{a, b, c, d, h, m, n, x, 6, 7\}$. As gravações foram realizadas através do uso de uma aplicação web disponibilizada pelo professor. No desenvolvimento da aplicação serão utilizados os conjuntos de treinamento e validação disponibilizados pelo professor, mas na avaliação do trabalho haverão gravações às quais os alunos não tiveram acesso, a fim de avaliar se o algoritmo utilizado apresentou boa generalização.
+
+A linguagem escolhida para o trabalho foi o \emph{Python}, e a principal bibliotecas utilizadas para a leitura e tratamento dos dados de audio foi a \emph{librosa}. Também utilizou-se \emph{Pandas}, \emph{Numpy} e outras bibliotecas comuns às aplicações relacionadas à análise de dados.
+
+
+\section{Análise Exploratória}
+
+\textcolor{blue}{Descreva possíveis problemas na base de dados, transformações feitas, atributos gerados etc.
+Tente utilizar gráficos para justificar suas propostas.}
+\begin{itemize}
+\item Arquivos com menos ou mais de 8 segundos
+\item Gravações do Google Tradutor (''sotaque de máquina/estrangeiro``)
+\end{itemize}}
+
+\section{Metodologia}
+
+Descreva os algoritmos que utilizará e a metodologia de avaliação que será
+considerada.
+
+\section{Resultados}
+
+Apresente tabelas de resultados e gráficos que auxiliem a compreensão dos
+mesmos.
+Note que seu script de experimento deve deixar claro o código gerador de cada tabela/gráfico.
+
+\section{Comentários Finais}
+
+Descreva os principais resultados obtidos e comente sobre:
+(i) dificuldades encontradas;
+(ii) ideias que não foram exploradas e razões;
+\textbf{Não esquecer de enviar junto ao relatório o script (de preferência R/Python) que executa os experimentos na base de dados e gera os resultados apresentados aqui.}
+
+\end{document}
