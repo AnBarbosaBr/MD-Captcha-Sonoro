@@ -24,7 +24,7 @@ training_data_path   = os.path.join(".","dados","TREINAMENTO")
 validation_data_path = os.path.join(".","dados","VALIDACAO")
 
 
-# In[10]:
+# In[44]:
 
 
 def get_files_from(path):
@@ -48,6 +48,7 @@ def get_labels(file):
     without_extension = os.path.splitext(base)[0]
     return without_extension
 
+
 def get_sampling_rate(file):
     return librosa.load(file, None)[1]
 
@@ -58,10 +59,11 @@ def join_onda_with_label(waves, labels, sampling_rate, duracao_minima = 2.0, dur
     ondas.insert(loc  = 0, column = 'label', value = labs)
     ondas.insert(loc  = 1, column = 'duracao', value = duracoes)
     ondas.insert(loc = 2, column = 'sr', value = sampling_rate )
+    ondas.insert(loc = 3, column = "original_file", value = labels)
     ondas = ondas[ (ondas['duracao'] >= duracao_minima) & (ondas['duracao'] <= duracao_maxima) ]
     return ondas
 
-def get_audio_and_sr_from_df(df, row_index, sample_rate_col_index = 2, first_data_col_index = 3, asNumpyArray = True ):
+def get_audio_and_sr_from_df(df, row_index, sample_rate_col_index = 2, first_data_col_index = 4, asNumpyArray = True ):
     data = df.iloc[row_index, first_data_col_index: ].astype('float64')
     if(asNumpyArray):
         data = data.values
@@ -69,16 +71,16 @@ def get_audio_and_sr_from_df(df, row_index, sample_rate_col_index = 2, first_dat
     return(data, sample_rate)
 
 
-# In[7]:
+# In[45]:
 
 
 f = get_files_from(training_data_path)
 
 
-# In[ ]:
+# In[46]:
 
 
-df = pd.DataFrame()
+lista_df = list()
 processed = 0
 to_be = len(f)
 for file in f:
@@ -87,12 +89,73 @@ for file in f:
     sr = get_sampling_rate(file)
     labels = get_labels(file)
     temp_df = join_onda_with_label(wave, labels, sr)
-    df.append(temp_df)
+    lista_df.append(temp_df)
     processed += 1
+
+
+# In[47]:
+
+
+df = pd.concat(lista_df, ignore_index=True)
+
+
+# In[48]:
+
+
+df.to_pickle("training_data.pickle")
+
+
+# In[54]:
+
+
+df.shape
+
+
+# In[65]:
+
+
+len(df.original_file.unique()) 
+
+
+# In[115]:
+
+
+grupos = df.groupby("original_file").sr.count().sort_values(0)
+grupo_problemas = grupos[grupos < 4] 
+grupo_problemas
 
 
 # In[ ]:
 
 
-df.to_pickle("training_data.pickle")
+# Esses arquivos não apresentaram 4 grupos. Hipótese: O arquivo tinha pouco menos de 2 segundos.
+# Processá-los manualmente e adicionar ao DF.
+# original_file 
+# xxxm    3
+# dhcd    3
+# haa6    3
+# cdbc    3
+# xbnb    3
+# cdbd    3
+# 7x6a    3
+# ca7m    3
+# 6add    3
+# mdn6    3
+# Name: sr, dtype: int64
+
+
+# In[117]:
+
+
+# Verificando os que estão no DF - realmente a ultima letra não aparece.
+df[[v in grupo_problemas  for v in df["original_file"]]]
+
+
+# In[119]:
+
+
+# Verificando se podemos obter os dados de audio de uma linha qualquer
+data, sr = get_audio_and_sr_from_df(df, 1409)
+print(df.label[1409])
+ipd.Audio(data, rate=sr)
 
