@@ -13076,7 +13076,7 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Importings base libraries</span>
@@ -13104,7 +13104,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># SETUP</span>
@@ -13117,7 +13117,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">## Ingestion Functions</span>
@@ -13205,7 +13205,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">## Pipeline Functions </span>
@@ -13239,7 +13239,8 @@ div#notebook {
     <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span> <span class="p">:</span> <span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
     
     <span class="n">label_encoder</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">LabelEncoder</span><span class="p">()</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span><span class="s2">&quot;?&quot;</span><span class="p">])</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">labels</span>
 
 <span class="k">def</span> <span class="nf">score_classifier</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
@@ -13278,7 +13279,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">## Main functions</span>
@@ -13321,7 +13322,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># RUNNING THE MODEL</span>
@@ -13346,7 +13347,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
@@ -13369,7 +13370,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Wall time: 15.7 s
+<pre>Wall time: 14.6 s
 </pre>
 </div>
 </div>
@@ -13384,7 +13385,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span> 
-<span class="c1">## Predicting and scoring the test</span>
+<span class="c1">### Predict and scoring the validation</span>
 <span class="n">train_predict_lda</span><span class="p">,</span> <span class="n">test_predict_lda</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">training_data</span><span class="p">,</span> <span class="n">validation_data</span><span class="p">,</span> <span class="n">lda</span><span class="p">)</span>
 </pre></div>
 
@@ -13551,7 +13552,7 @@ Wall time: 4.34 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span> 
@@ -13597,16 +13598,16 @@ It got right 0 letters of: 169 words.
 
 Those are the words and hit count:
 dbbb    3
+bbbc    2
+mhxx    2
 bxx6    2
 bnbx    2
-mxxx    2
-7bnm    2
        ..
-7bah    1
-xdbc    1
-bn66    1
-b76b    1
-xbha    1
+nna7    1
+bad7    1
+cbha    1
+hhxb    1
+nada    1
 Name: original_file, Length: 98, dtype: int64
 Those are the letters:
 b    61
@@ -13615,11 +13616,11 @@ n     9
 7     7
 6     6
 d     4
-c     4
 m     4
+c     4
 h     2
 Name: label, dtype: int64
-Wall time: 1min 1s
+Wall time: 1min 2s
 </pre>
 </div>
 </div>
@@ -13634,7 +13635,7 @@ Wall time: 1min 1s
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
-<span class="c1">### Scoring the training data</span>
+<span class="c1">### NB: Scoring the training</span>
 <span class="n">score_classifier</span><span class="p">(</span><span class="n">training_data</span><span class="p">,</span> <span class="n">train_predict_nb</span><span class="p">)</span>
 </pre></div>
 
@@ -13699,6 +13700,103 @@ c    15
 h    13
 Name: label, dtype: int64
 Wall time: 2.4 s
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[43]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="c1">## RF</span>
+<span class="c1">### Predict and scoring the validation</span>
+<span class="n">rf</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">max_depth</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">min_samples_split</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">train_predict_rf</span><span class="p">,</span> <span class="n">test_predict_rf</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">training_data</span><span class="p">,</span> <span class="n">validation_data</span><span class="p">,</span> <span class="n">rf</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
+[Parallel(n_jobs=1)]: Done 1000 out of 1000 | elapsed:  5.3min finished
+[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
+[Parallel(n_jobs=1)]: Done 1000 out of 1000 | elapsed:    0.4s finished
+[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
+[Parallel(n_jobs=1)]: Done 1000 out of 1000 | elapsed:    0.4s finished
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Confusion Matrix:
+[[26  8 16 26  1  4  1  3  2 13]
+ [17  8 11 36  5  3  3  9  4 18]
+ [17  4 21 29  4  4  0 10  1  7]
+ [ 6  7 23 36  4  8  1 11  2  8]
+ [16  6 18 35  9  4  1  8  1  9]
+ [12 10 19 35  6 10  3  5  3  7]
+ [17  5 18 36  6  0  7 10  3 20]
+ [13  4 19 28  2  2  3 14  5 14]
+ [12  7 13 38  3  4  3 11  2 20]
+ [16  8 16 23  2  3  1  9  5 12]]
+
+ Other Observations:
+It got right: 145 from 1068 letters: 13.58%
+It received 267 words. 
+It got right 4 letters of: 0 words.
+It got right 3 letters of: 0 words.
+It got right 2 letters of: 29 words.
+It got right 1 letters of: 87 words.
+It got right 0 letters of: 151 words.
+
+Those are the words and hit count:
+cbha    2
+dbbb    2
+xc6b    2
+bh76    2
+d76h    2
+       ..
+haaa    1
+b66b    1
+d7xx    1
+cc6d    1
+ax7b    1
+Name: original_file, Length: 116, dtype: int64
+Those are the letters:
+b    36
+6    26
+a    21
+m    14
+x    12
+d    10
+c     9
+7     8
+h     7
+n     2
+Name: label, dtype: int64
+Wall time: 19min 40s
 </pre>
 </div>
 </div>

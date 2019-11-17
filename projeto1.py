@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[14]:
 
 
 # Importings base libraries
@@ -17,18 +17,18 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 import sklearn.model_selection # train_test_split
 import sklearn.discriminant_analysis # LinearDiscriminantAnalysis
 import sklearn.naive_bayes  # GaussianNB
-
+import sklearn.ensemble
 
 seed = 42
 
 
-# In[8]:
+# In[2]:
 
 
 # SETUP
 
 
-# In[9]:
+# In[3]:
 
 
 ## Ingestion Functions
@@ -109,7 +109,7 @@ def _load_wavs_from_dir(directory, verbose=False):
     return(df)
 
 
-# In[10]:
+# In[4]:
 
 
 ## Pipeline Functions 
@@ -143,7 +143,8 @@ def extract_labels(df):
     labels = df.loc[ : , "label"]
     
     label_encoder = sklearn.preprocessing.LabelEncoder()
-    labels = label_encoder.fit_transform(labels)
+    label_encoder.fit(["a", "b", "c", "d", "h", "m", "n", "x", "6", "7","?"])
+    labels = label_encoder.transform(labels)
     return labels
 
 def score_classifier(df, y_pred):
@@ -175,7 +176,7 @@ def score_classifier(df, y_pred):
     
 
 
-# In[11]:
+# In[6]:
 
 
 ## Main functions
@@ -211,7 +212,7 @@ def process_folder(training_folder, validation_folder, algorithm):
     
 
 
-# In[12]:
+# In[7]:
 
 
 # RUNNING THE MODEL
@@ -229,7 +230,7 @@ lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
 nb = sklearn.naive_bayes.GaussianNB()
 
 
-# In[13]:
+# In[8]:
 
 
 get_ipython().run_cell_magic('time', '', '## Loading\ntraining_data = load_data(train_path, train_pickle)\nvalidation_data = load_data(test_path, test_pickle)')
@@ -238,7 +239,7 @@ get_ipython().run_cell_magic('time', '', '## Loading\ntraining_data = load_data(
 # In[17]:
 
 
-get_ipython().run_cell_magic('time', '', '## Predicting and scoring the test\ntrain_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
+get_ipython().run_cell_magic('time', '', '### Predict and scoring the validation\ntrain_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
 
 
 # In[19]:
@@ -247,7 +248,7 @@ get_ipython().run_cell_magic('time', '', '## Predicting and scoring the test\ntr
 get_ipython().run_cell_magic('time', '', '## LDA\n### Scoring the training\nscore_classifier(training_data, train_predict_lda)')
 
 
-# In[14]:
+# In[9]:
 
 
 get_ipython().run_cell_magic('time', '', '## NB\n### Predict and scoring the validation\ntrain_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)')
@@ -256,5 +257,17 @@ get_ipython().run_cell_magic('time', '', '## NB\n### Predict and scoring the val
 # In[16]:
 
 
-get_ipython().run_cell_magic('time', '', '### Scoring the training data\nscore_classifier(training_data, train_predict_nb)')
+get_ipython().run_cell_magic('time', '', '### NB: Scoring the training\nscore_classifier(training_data, train_predict_nb)')
+
+
+# In[ ]:
+
+
+get_ipython().run_cell_magic('time', '', '## RF\n### Predict and scoring the validation\nrf = sklearn.ensemble.RandomForestClassifier(n_estimators = 100, max_depth = 10, min_samples_split = 5, random_state=seed, verbose=True)\ntrain_predict_rf, test_predict_rf = process_data(training_data, validation_data, rf)')
+
+
+# In[ ]:
+
+
+
 
