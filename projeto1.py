@@ -216,10 +216,11 @@ def process_folder(training_folder, validation_folder, algorithm):
 
 # RUNNING THE MODEL
 ## Inputs
+### In-paths
 train_path = ".\\dados\\TREINAMENTO\\"
 test_path  = ".\\dados\\VALIDACAO\\"
 
-## Input Saving -> Will be used to avoid having to reload all data
+### Out-paths -> Will be used to avoid having to reload all data
 train_pickle = ".\\dados\\treina_1752.pickle"
 test_pickle = ".\\dados\\valida_1752.pickle"
 
@@ -231,41 +232,29 @@ nb = sklearn.naive_bayes.GaussianNB()
 # In[13]:
 
 
-get_ipython().run_cell_magic('time', '', '# Testando ler os dados\ntraining_data = load_data(train_path, train_pickle)\nvalidation_data = load_data(test_path, test_pickle)')
+get_ipython().run_cell_magic('time', '', '## Loading\ntraining_data = load_data(train_path, train_pickle)\nvalidation_data = load_data(test_path, test_pickle)')
 
 
 # In[17]:
 
 
-get_ipython().run_cell_magic('time', '', 'train_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
-
-
-# In[18]:
-
-
-get_ipython().run_cell_magic('time', '', 'score_classifier(validation_data, test_predict_lda)')
+get_ipython().run_cell_magic('time', '', '## Predicting and scoring the test\ntrain_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
 
 
 # In[19]:
 
 
-get_ipython().run_cell_magic('time', '', 'score_classifier(training_data, train_predict_lda)')
+get_ipython().run_cell_magic('time', '', '## LDA\n### Scoring the training\nscore_classifier(training_data, train_predict_lda)')
 
 
 # In[14]:
 
 
-get_ipython().run_cell_magic('time', '', 'train_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)')
-
-
-# In[15]:
-
-
-get_ipython().run_cell_magic('time', '', 'score_classifier(validation_data, test_predict_nb)')
+get_ipython().run_cell_magic('time', '', '## NB\n### Predict and scoring the validation\ntrain_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)')
 
 
 # In[16]:
 
 
-get_ipython().run_cell_magic('time', '', 'score_classifier(training_data, train_predict_nb)')
+get_ipython().run_cell_magic('time', '', '### Scoring the training data\nscore_classifier(training_data, train_predict_nb)')
 
