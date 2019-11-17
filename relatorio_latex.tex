@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+
 \title{Relatório do Projeto --- Mineração de Dados}
 \author{Primeiro autor, Segundo autor e Terceiro autor}
 \date{}
@@ -20,27 +22,35 @@ A linguagem escolhida para o trabalho foi o \emph{Python}, e a principal bibliot
 
 \textcolor{blue}{Descreva possíveis problemas na base de dados, transformações feitas, atributos gerados etc.
 Tente utilizar gráficos para justificar suas propostas.}
+Uma primeira análise foi efetuada ouvindo uma amostra das gravações de treino. Dessa forma, identificou-se os seguintes problemas:
 \begin{itemize}
-\item Arquivos com menos ou mais de 8 segundos
-\item Gravações do Google Tradutor (''sotaque de máquina/estrangeiro``)
-\end{itemize}}
+\item Arquivos com durações diferentes de 8 segundos. Alguns com menos outros com um pouco mais.
+\item Gravações do Google Tradutor (sotaque de \emph{máquina}/\emph{estrangeiro}).
+\item Gravações com volumes diferentes.
+\item Letras com sons semelhantes (b/d)
+\item Ruídos
+\end{itemize}
 
 \section{Metodologia}
-
-Descreva os algoritmos que utilizará e a metodologia de avaliação que será
-considerada.
+\textcolor{blue}{
+	Descreva os algoritmos que utilizará e a metodologia de avaliação que será
+	considerada.
+}
 
 \section{Resultados}
-
-Apresente tabelas de resultados e gráficos que auxiliem a compreensão dos
-mesmos.
-Note que seu script de experimento deve deixar claro o código gerador de cada tabela/gráfico.
+\textcolor{blue}{
+	Apresente tabelas de resultados e gráficos que auxiliem a compreensão dos
+	mesmos.
+	Note que seu script de experimento deve deixar claro o código gerador de cada tabela/gráfico.
+}
 
 \section{Comentários Finais}
 
-Descreva os principais resultados obtidos e comente sobre:
-(i) dificuldades encontradas;
-(ii) ideias que não foram exploradas e razões;
-\textbf{Não esquecer de enviar junto ao relatório o script (de preferência R/Python) que executa os experimentos na base de dados e gera os resultados apresentados aqui.}
+\textcolor{blue}{
+	Descreva os principais resultados obtidos e comente sobre:
+	(i) dificuldades encontradas;
+	(ii) ideias que não foram exploradas e razões;
+	\textbf{Não esquecer de enviar junto ao relatório o script (de preferência R/Python) que executa os experimentos na base de dados e gera os resultados apresentados aqui.}
+}
 
 \end{document}
