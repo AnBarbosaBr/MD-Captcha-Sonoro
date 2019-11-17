@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[7]:
 
 
 # Importings base libraries
@@ -22,13 +22,13 @@ import sklearn.naive_bayes  # GaussianNB
 seed = 42
 
 
-# In[2]:
+# In[8]:
 
 
 # SETUP
 
 
-# In[3]:
+# In[9]:
 
 
 ## Ingestion Functions
@@ -109,7 +109,7 @@ def _load_wavs_from_dir(directory, verbose=False):
     return(df)
 
 
-# In[4]:
+# In[10]:
 
 
 ## Pipeline Functions 
@@ -132,7 +132,8 @@ def load_data(data_directory, output_pickle_file = None, reuse_if_exists=True):
 
 def preprocess_data(df):
     ''' Filtre, remova nulls, e transforme os dados nessa etapa'''
-    return df.fillna(0, inplace=False)
+    prepared = df[df.label != "?"] # Remove rows with unknown labels
+    return prepared.fillna(0, inplace=False)
 
 def extract_features(df):
     features = df.iloc[ : , df.columns.get_loc(0): ]
@@ -145,8 +146,36 @@ def extract_labels(df):
     labels = label_encoder.fit_transform(labels)
     return labels
 
+def score_classifier(df, y_pred):
+    prepared_data = preprocess_data(df)
+    y_real = extract_labels(prepared_data)
+    
+    print("Confusion Matrix:")
+    print(sklearn.metrics.confusion_matrix(y_true=y_real, y_pred = y_pred))
+    
+    print("\n Other Observations:")
+    
+    trues = y_real == y_pred
+    hits = sum(trues)
+    total = len(y_pred)
+    print(f"It got right: {hits} from {total} letters: {100*hits/total :.2f}%")
+    word_hits = prepared_data[trues].original_file.value_counts()
+    unique_words = len(df.original_file.unique())
+    print(f"It received {unique_words} words. ")
+    print(f"It got right 4 letters of: {sum(word_hits == 4)} words.\n" +
+          f"It got right 3 letters of: {sum(word_hits == 3)} words.\n" +
+          f"It got right 2 letters of: {sum(word_hits == 2)} words.\n" +
+          f"It got right 1 letters of: {sum(word_hits == 1)} words.\n" +
+          f"It got right 0 letters of: {unique_words - len(word_hits)} words.\n")
+    
+    print("Those are the words and hit count:")
+    print(word_hits)
+    print("Those are the letters:")
+    print(prepared_data[trues].label.value_counts())
+    
 
-# In[5]:
+
+# In[11]:
 
 
 ## Main functions
@@ -169,51 +198,74 @@ def process_data(training_data, validation_data, algorithm):
     predict_train = algorithm.predict(x_train)
     predict_test  = algorithm.predict(x_test)
     
+    score_classifier(validation_data, predict_test)
+    
     return(predict_train, predict_test)
-    
-    
-    
     
 def process_folder(training_folder, validation_folder, algorithm):
     ## Ler os dados
-    training_data = load_data(training_folder)
-    validation_data = load_data(validation_folder)
+    training_data = load_data(training_folder, verbose=True)
+    validation_data = load_data(validation_folder, verbose=True)
     
     return process_data(training_data, validation_data, algorithm)
     
 
 
-# In[6]:
+# In[12]:
 
 
 # RUNNING THE MODEL
 ## Inputs
-train_path = ".\\dados\\treinar\\"
-test_path  = ".\\dados\\validar\\"
+train_path = ".\\dados\\TREINAMENTO\\"
+test_path  = ".\\dados\\VALIDACAO\\"
 
 ## Input Saving -> Will be used to avoid having to reload all data
-train_pickle = ".\\dados\\saving_treinamento.pickle"
-test_pickle = ".\\dados\\saving_teste.pickle"
+train_pickle = ".\\dados\\treina_1752.pickle"
+test_pickle = ".\\dados\\valida_1752.pickle"
 
 ## Algorithms
 lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
-lda2 = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
+nb = sklearn.naive_bayes.GaussianNB()
 
 
-# In[7]:
+# In[13]:
 
 
 get_ipython().run_cell_magic('time', '', '# Testando ler os dados\ntraining_data = load_data(train_path, train_pickle)\nvalidation_data = load_data(test_path, test_pickle)')
 
 
-# In[8]:
+# In[17]:
 
 
-get_ipython().run_cell_magic('time', '', 'train_predict, test_predict = process_data(training_data, validation_data, lda)')
+get_ipython().run_cell_magic('time', '', 'train_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
 
 
-# In[9]:
+# In[18]:
 
 
-get_ipython().run_cell_magic('time', '', '# Testando ler os diretorios\n\n\ntrain_predict_from_folder, test_predict_from_folder = process_folder(train_path, test_path, lda2)')
+get_ipython().run_cell_magic('time', '', 'score_classifier(validation_data, test_predict_lda)')
+
+
+# In[19]:
+
+
+get_ipython().run_cell_magic('time', '', 'score_classifier(training_data, train_predict_lda)')
+
+
+# In[14]:
+
+
+get_ipython().run_cell_magic('time', '', 'train_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)')
+
+
+# In[15]:
+
+
+get_ipython().run_cell_magic('time', '', 'score_classifier(validation_data, test_predict_nb)')
+
+
+# In[16]:
+
+
+get_ipython().run_cell_magic('time', '', 'score_classifier(training_data, train_predict_nb)')
 
