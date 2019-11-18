@@ -33,5 +33,9 @@ label_encoder.fit(["a", "b", "c", "d", "h", "m", "n", "x", "6", "7","?"])
 labels_human = label_encoder.inverse_transform(labels_predicted)
 ```
 
-Para obter o arquivo original, é necessário efetuar o pré-processamento dos dados com *preprocess(df)*.
+Para obter o arquivo original, é necessário efetuar o pré-processamento dos dados com *preprocess(df)* e concatenar as predições. Isso pode ser feito dessa forma:
+```python
+preprocessed_df = preprocess(df)
+preprocessed_df.insert(loc  = 0, column = 'pred_label', value = labels_human)
+```
 
