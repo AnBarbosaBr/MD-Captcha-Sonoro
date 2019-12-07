@@ -105,3 +105,8 @@ venv.bak/
 dados/
 md/
 training_data.pickle
+audio_eda-Copy1.ipynb
+relatorio_latex.synctex.gz
+validation_data.pickle
+validation.pickle
+.vscode/settings.json
