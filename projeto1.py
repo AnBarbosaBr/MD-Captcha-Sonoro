@@ -173,8 +173,6 @@ def score_classifier(df, y_pred):
     print(word_hits)
     print("Those are the letters:")
     print(prepared_data[trues].label.value_counts())
-    
-
 
 # In[6]:
 
@@ -211,7 +209,6 @@ def process_folder(training_folder, validation_folder, algorithm):
     return process_data(training_data, validation_data, algorithm)
     
 
-
 # In[7]:
 
 
@@ -222,24 +219,25 @@ train_path = ".\\dados\\TREINAMENTO\\"
 test_path  = ".\\dados\\VALIDACAO\\"
 
 ### Out-paths -> Will be used to avoid having to reload all data
-train_pickle = ".\\dados\\treina_1752.pickle"
-test_pickle = ".\\dados\\valida_1752.pickle"
+train_pickle = None
+test_pickle = None
 
 ## Algorithms
 lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
 nb = sklearn.naive_bayes.GaussianNB()
 
-
 # In[8]:
 
-
-get_ipython().run_cell_magic('time', '', '## Loading\ntraining_data = load_data(train_path, train_pickle)\nvalidation_data = load_data(test_path, test_pickle)')
+## Loading
+training_data = load_data(train_path, train_pickle)
+validation_data = load_data(test_path, test_pickle)
 
 
 # In[17]:
 
 
-get_ipython().run_cell_magic('time', '', '### Predict and scoring the validation\ntrain_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)')
+### Predict and scoring the validation
+train_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)
 
 
 # In[19]:
@@ -251,23 +249,19 @@ get_ipython().run_cell_magic('time', '', '## LDA\n### Scoring the training\nscor
 # In[9]:
 
 
-get_ipython().run_cell_magic('time', '', '## NB\n### Predict and scoring the validation\ntrain_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)')
+## LDA
+### Scoring the training
+score_classifier(training_data, train_predict_lda)
 
 
 # In[16]:
 
 
-get_ipython().run_cell_magic('time', '', '### NB: Scoring the training\nscore_classifier(training_data, train_predict_nb)')
+score_classifier(training_data, train_predict_nb)
 
 
 # In[ ]:
-
-
-get_ipython().run_cell_magic('time', '', '## RF\n### Predict and scoring the validation\nrf = sklearn.ensemble.RandomForestClassifier(n_estimators = 100, max_depth = 10, min_samples_split = 5, random_state=seed, verbose=True)\ntrain_predict_rf, test_predict_rf = process_data(training_data, validation_data, rf)')
-
-
-# In[ ]:
-
-
-
-
+## RF
+### Predict and scoring the validation
+rf = sklearn.ensemble.RandomForestClassifier(n_estimators = 100, max_depth = 10, min_samples_split = 5, random_state=seed, verbose=True)
+train_predict_rf, test_predict_rf = process_data(training_data, validation_data, rf)
