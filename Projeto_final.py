@@ -10,12 +10,17 @@ import pandas as pd;
 import numpy as np;
 import librosa;
 
-# Models
-import sklearn.model_selection # train_test_split
-import sklearn.discriminant_analysis # LinearDiscriminantAnalysis
-import sklearn.naive_bayes  # GaussianNB
 import sklearn.ensemble
-
+import sklearn.model_selection 
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+from sklearn.metrics import f1_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (KBinsDiscretizer, MinMaxScaler, Normalizer,
+                                   StandardScaler)
 seed = 42
 
 
@@ -144,22 +149,67 @@ def preprocess_data(df):
     return prepared.fillna(0, inplace=False)
 
 
-def extract_features_old(df):
-    features = df.iloc[ : , df.columns.get_loc(0): ]    
-    return features
+def old_extract_features(df):
+    """Função usada na primeira parte do projeto"""
+    return df.iloc[ : , df.columns.get_loc(0): ]
 
 def extract_features(df):
-    features = df.iloc[ : , df.columns.get_loc(0): ]
-    sample_rate = df.iloc[ : , SAMPLE_RATE]
-    mfccs     = np.mean(librosa.feature.mfcc(y=features, sr=sample_rate, n_mfcc=20).T, axis=0)
-    centroid  = librosa.feature.spectral_centroid(y = features, sr = sample_rate)
-    bandwidth = librosa.feature.spectral_bandwidth(y = features, sr = sample_rate)
-    flatness  = librosa.feature.spectral_flatness(y = features, sr = sample_rate)
-    rollof    = librosa.feature.spectral_rollof(y = features, sr = sample_rate)
-    tonnetz   = librosa.feature.tonnetz(y = features, sr = sample_rate)
-    zero_crossing = librosa.feature.zero_crossing_rate(y = features, sr = sample_rate)
+    """Função que extraí as features baseada nos dados do audio"""
+    features_df = df.iloc[ : , df.columns.get_loc(0): ]
+    sample_rate = df.loc[ : , SAMPLE_RATE]
+    
+    mfcc_dict = dict()
+    centroid_dict = dict()
+    bandwidth_dict = dict()
+    flatness_dict = dict()
+    rolloff_dict = dict()
+    zero_crossing_dict = dict()
+    
+    for index, row in features_df.iterrows():
+        audio_data = row.values.astype('float64')
+        sr = sample_rate[index]
+        mfcc_dict[index] = np.mean(
+                                librosa.feature.mfcc(y = audio_data,
+                                                     sr=sr, 
+                                                     n_mfcc=20).T,  # Transposta do mfcc
+                                axis=0)
+        centroid_dict[index] = np.mean(
+                                librosa.feature.spectral_centroid(y = audio_data,
+                                                                 n_fft=4096, hop_length=1024,
+                                                                 sr = sr).T,
+                                axis = 0)
+        bandwidth_dict[index] = np.mean(
+                                 librosa.feature.spectral_bandwidth(y = audio_data, 
+                                                                   sr = sr).T,
+                                axis = 0)
+        flatness_dict[index]  = np.mean(
+                                 librosa.feature.spectral_flatness(y = audio_data).T,
+                                 axis = 0)
+        rolloff_dict[index]    = np.mean(
+                                    librosa.feature.spectral_rolloff(y = audio_data).T,
+                                    axis = 0)
+        
+        zero_crossing_dict[index] = np.sum(
+                                        librosa.feature.zero_crossing_rate(y = audio_data).T,
+                                        axis = 0)
+    mfcc_df     = pd.DataFrame.from_dict(mfcc_dict,orient = "index")
+    mfcc_df.columns = ["mfcc_"+ str(col)for col in mfcc_df.columns]
+    
+    centroid_df = pd.DataFrame.from_dict(centroid_dict, orient = "index", columns=["centroid"])
+    
+    bandwidth_df = pd.DataFrame.from_dict(bandwidth_dict, orient = "index", columns=["bandwidth"])
+    
+    flatness_df = pd.DataFrame.from_dict(flatness_dict, orient = "index", columns=["flatness"])
+    
+    rolloff_df = pd.DataFrame.from_dict(rolloff_dict, orient = "index", columns=["rolloff"])
+    
+    zero_crossing_df = pd.DataFrame.from_dict(zero_crossing_dict, orient = "index", columns=["zero_crossing"])
+
+    return_df = pd.concat([zero_crossing_df, rolloff_df, flatness_df, bandwidth_df, centroid_df, mfcc_df], axis = 1)
+    return return_df
         
     return features
+
 
 def extract_labels(df):
     labels = df.loc[ : , LABEL]
@@ -169,34 +219,6 @@ def extract_labels(df):
     labels = label_encoder.transform(labels)
     return labels
 
-def score_classifier(df, y_pred):
-    prepared_data = preprocess_data(df)
-    y_real = extract_labels(prepared_data)
-    
-    print("Confusion Matrix:")
-    print(sklearn.metrics.confusion_matrix(y_true=y_real, y_pred = y_pred))
-    
-    print("\n Other Observations:")
-    
-    trues = y_real == y_pred
-    hits = sum(trues)
-    total = len(y_pred)
-    print(f"It got right: {hits} from {total} letters: {100*hits/total :.2f}%")
-    word_hits = prepared_data[trues].original_file.value_counts()
-    unique_words = len(df.original_file.unique())
-    print(f"It received {unique_words} words. ")
-    print(f"It got right 4 letters of: {sum(word_hits == 4)} words.\n" +
-          f"It got right 3 letters of: {sum(word_hits == 3)} words.\n" +
-          f"It got right 2 letters of: {sum(word_hits == 2)} words.\n" +
-          f"It got right 1 letters of: {sum(word_hits == 1)} words.\n" +
-          f"It got right 0 letters of: {unique_words - len(word_hits)} words.\n")
-    
-    print("Those are the words and hit count:")
-    print(word_hits)
-    print("Those are the letters:")
-    print(prepared_data[trues].label.value_counts())
-    
-  
     
 # In[5]:   
 """
@@ -235,7 +257,65 @@ def process_folder(training_folder, validation_folder, algorithm):
     return process_data(training_data, validation_data, algorithm)
 
 
+
+
 # In[6]:
+"""
+===============================================================================
+                    DEFINING MODEL FUNCIONS
+===============================================================================
+""" 
+## Essas funções servem para avaliar o projeto
+def score_classifier(df, y_pred):
+    """Recebe um dataframe completo(com dados e labels) e o compara com o y_pred"""
+    prepared_data = preprocess_data(df)
+    y_real = extract_labels(prepared_data)
+    
+    print("Matriz de Confusão:")
+    print(sklearn.metrics.confusion_matrix(y_true=y_real, y_pred = y_pred))
+    
+    print("\n Outras Observações:")
+    
+    trues = y_real == y_pred
+    hits = sum(trues)
+    total = len(y_pred)
+    print(f"It got right: {hits} from {total} letters: {100*hits/total :.2f}%")
+    word_hits = prepared_data[trues].original_file.value_counts()
+    unique_words = len(df.original_file.unique())
+    print(f"It received {unique_words} words. ")
+    print(f"It got right 4 letters of: {sum(word_hits == 4)} words. ({100*sum(word_hits==4)/unique_words:.2f}%)\n" +
+          f"It got right 3 letters of: {sum(word_hits == 3)} words.\n" +
+          f"It got right 2 letters of: {sum(word_hits == 2)} words.\n" +
+          f"It got right 1 letters of: {sum(word_hits == 1)} words.\n" +
+          f"It got right 0 letters of: {unique_words - len(word_hits)} words ({100*(unique_words - len(word_hits))/unique_words :.2f}%).\n")
+
+    print("Palavras - Número de letras Acertadas:")
+    print(word_hits)
+
+    print("Resumo - Letras:")
+    letters_count = prepared_data.label.value_counts()
+    letters_right = prepared_data[trues].label.value_counts()
+    letters_df = pd.DataFrame({"correct": letters_right, "total": letters_count})
+    letters_df['accuracy'] = 100*letters_df['correct']/letters_df['total']
+    print(letters_df.sort_values('accuracy'))
+ 
+    return f1_score(y_true = y_real, y_pred = y_pred, average="macro")
+  
+def fit_predict_score(x_train, y_train, x_test, validation_data, algorithm):
+    # Fit model
+    print("Treinando o modelo...")
+    algorithm.fit(x_train, y_train)
+
+    # Predict
+    print("Classificando a validação...")
+    predict_test  = algorithm.predict(x_test)
+
+    print("Pontuando a validação...")
+    return (score_classifier(validation_data, predict_test))
+    
+
+
+# In[7]:
 """
 ===============================================================================
             DEFINING DATA PATH AND CREATING MODEL (LDA AND NAIVE BAYES)
@@ -257,7 +337,7 @@ lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
 nb = sklearn.naive_bayes.GaussianNB()
 
 
-# In[7]:
+# In[8]:
 """
 ===============================================================================
                         LOADING DATA
@@ -268,7 +348,7 @@ training_data = load_data(train_path, train_pickle)
 validation_data = load_data(test_path, test_pickle)
 
 
-# In[8]:
+# In[9]:
 """
 ===============================================================================
                         RUNNING MODEL (LDA)
@@ -283,7 +363,7 @@ train_predict_lda, test_predict_lda = process_data(training_data, validation_dat
 score_classifier(training_data, train_predict_lda)
 
 
-# In[9]:
+# In[10]:
 """
 ===============================================================================
                         RUNNING MODEL (NB)
@@ -298,7 +378,7 @@ train_predict_nb, test_predict_nb = process_data(training_data, validation_data,
 score_classifier(training_data, train_predict_nb)
 
 
-# In[10]:
+# In[11]:
 """
 ===============================================================================
                         RUNNING MODEL (RANDOM FOREST)
