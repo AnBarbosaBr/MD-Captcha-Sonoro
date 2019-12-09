@@ -1,4 +1,27 @@
-# In[1]:
+
+"""
+IMPORTANTE: Ao classificar os resultados finais, esse script gera um 
+csv na localização do "output_csv"
+
+Esses são os "PARAMETROS" do script:
+            * train_path e test_path indicam os diretórios
+        onde estão os dados para o treinamento e 
+        validação do modelo.
+            * train_pickle e test_pickle são a localização
+        de um arquivo auxiliar contendo os dados já proces-
+        sados pelo script. 
+            Se for None, a variável é ignorada pelo script,
+        se tiver algum valor, e o arquivo existir, o script
+        irá ler o conteúdo dessa variável ao invés de proces-
+        sar os dados dos diretórios. Se o arquivo não existir,
+        o script processará os dados dos diretórios e salvará
+        no arquivo pickle.
+            * output_csv: Se definido, é o arquivo que será gerado pelo 
+        classificador final, contendo as labels dos arquivos lidos do 
+        diretório de validação e as validações. Se for None,
+        é ignorado.
+"""
+
 """
 ===============================================================================
                         IMPORTING LIBRARIES
@@ -21,10 +44,21 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (KBinsDiscretizer, MinMaxScaler, Normalizer,
                                    StandardScaler)
-seed = 42
 
 
-# In[2]:
+"""
+===============================================================================
+                        DEFINING DATA PATHS
+===============================================================================
+""" 
+# Input
+train_path = ".\\TREINAMENTO\\"
+test_path  = ".\\VALIDACAO\\"
+train_pickle = None 
+test_pickle = None  
+# Output
+output_path = None # ".\\projeto_md.csv"
+
 """
 ===============================================================================
                                 SETUP
@@ -35,7 +69,9 @@ SAMPLE_RATE = "sr"
 LABEL = "label"
 DURACAO = "duracao"
 ARQUIVO_ORIGINAL = "original_file"
-
+PREDICAO = "predicao"
+seed = 42
+np.random.seed(seed)
 
 # In[3]:
 """
@@ -208,8 +244,6 @@ def extract_features(df):
     return_df = pd.concat([zero_crossing_df, rolloff_df, flatness_df, bandwidth_df, centroid_df, mfcc_df], axis = 1)
     return return_df
         
-    return features
-
 
 def extract_labels(df):
     labels = df.loc[ : , LABEL]
@@ -246,13 +280,18 @@ def process_data(training_data, validation_data, algorithm):
     predict_test  = algorithm.predict(x_test)
     
     score_classifier(validation_data, predict_test)
-    
-    return(predict_train, predict_test)
+           
+    label_encoder = sklearn.preprocessing.LabelEncoder()
+    label_encoder.fit(["a", "b", "c", "d", "h", "m", "n", "x", "6", "7","?"])
+
+    train_data[PREDICAO] = label_encoder.inverse_transform(predict_train)
+    test_data[PREDICAO] = label_encoder.inverse_transform(predict_test)
+    return(train_data, test_data)
     
 def process_folder(training_folder, validation_folder, algorithm):
     ## Ler os dados
-    training_data = load_data(training_folder, verbose=True)
-    validation_data = load_data(validation_folder, verbose=True)
+    training_data = load_data(training_folder)
+    validation_data = load_data(validation_folder)
     
     return process_data(training_data, validation_data, algorithm)
 
@@ -315,27 +354,6 @@ def fit_predict_score(x_train, y_train, x_test, validation_data, algorithm):
     
 
 
-# In[7]:
-"""
-===============================================================================
-            DEFINING DATA PATH AND CREATING MODEL (LDA AND NAIVE BAYES)
-===============================================================================
-""" 
-
-# 
-## Inputs
-### In-paths
-train_path = ".\\dados\\TREINAMENTO\\"
-test_path  = ".\\dados\\VALIDACAO\\"
-
-### Out-paths -> Will be used to avoid having to reload all data
-train_pickle = ".\\dados\\treina_1752.pickle"
-test_pickle = ".\\dados\\valida_1752.pickle"
-
-## Algorithms
-lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
-nb = sklearn.naive_bayes.GaussianNB()
-
 
 # In[8]:
 """
@@ -343,7 +361,7 @@ nb = sklearn.naive_bayes.GaussianNB()
                         LOADING DATA
 ===============================================================================
 """ 
-
+print("Loading Data...")
 training_data = load_data(train_path, train_pickle)
 validation_data = load_data(test_path, test_pickle)
 
@@ -354,13 +372,12 @@ validation_data = load_data(test_path, test_pickle)
                         RUNNING MODEL (LDA)
 ===============================================================================
 """
+print("Running LDA...")
+## Classifier 
+lda = sklearn.discriminant_analysis.LinearDiscriminantAnalysis()
+
 ### Predict and scoring the validation
 train_predict_lda, test_predict_lda = process_data(training_data, validation_data, lda)
-
-
-## LDA
-### Scoring the training
-score_classifier(training_data, train_predict_lda)
 
 
 # In[10]:
@@ -369,13 +386,12 @@ score_classifier(training_data, train_predict_lda)
                         RUNNING MODEL (NB)
 ===============================================================================
 """
+print("Running NB...")
+## Classifier 
+nb = sklearn.naive_bayes.GaussianNB()
 ## NB
 ### Predict and scoring the validation
 train_predict_nb, test_predict_nb = process_data(training_data, validation_data, nb)
-
-
-### NB: Scoring the training
-score_classifier(training_data, train_predict_nb)
 
 
 # In[11]:
@@ -384,7 +400,20 @@ score_classifier(training_data, train_predict_nb)
                         RUNNING MODEL (RANDOM FOREST)
 ===============================================================================
 """
+print("Running Optimal RF...")
 ## RF
 ### Predict and scoring the validation
-rf = sklearn.ensemble.RandomForestClassifier(n_estimators = 100, max_depth = 10, min_samples_split = 5, random_state=seed, verbose=True)
+rf = RandomForestClassifier(random_state = seed, n_jobs = -1,
+                                max_depth = 20,
+                                max_features = 0.3,
+                                n_estimators = 900)
+
 train_predict_rf, test_predict_rf = process_data(training_data, validation_data, rf)
+
+print("\n---- ---- ---- RESULTADOS ---- ---- ----\n")
+
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):  
+    print(test_predict_rf[[LABEL, ARQUIVO_ORIGINAL, PREDICAO]])
+
+if(output_path):
+    test_predict_rf[[LABEL, ARQUIVO_ORIGINAL, PREDICAO]].to_csv(output_path)
